@@ -1,0 +1,129 @@
+@baseUrl = http://localhost:8080
+
+###Create a new user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "email": "user1@email.com"
+}
+> {%
+ const body = JSON.parse(response.body || '{}');
+ client.assert(response.status===201, 'Expected 201 Created for user creation');
+ client.global.set('user1Id', body.id)
+ %}
+
+###List all users (-> shows the newly created user)
+GET {{baseUrl}}/users
+
+> {%
+ const users=JSON.parse(response.body || '[]');
+ client.assert(Array.isArray(users) && users.length >= 1, 'Expected at least one user');
+ %}
+
+###Create another user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+"username":"user2",
+"email":"user2@email.com"
+}
+> {%
+    const body = JSON.parse(response.body || '{}');
+    client.assert(response.status===201, 'Expected 201 Created for user creation');
+    client.global.set('user2Id', body.id)
+%}
+
+###List all users again (-> shows two users)
+GET {{baseUrl}}/users
+
+> {%
+    const users=JSON.parse(response.body || '[]');
+    client.assert(Array.isArray(users) && users.length >= 2, 'Expected at least two user');
+%}
+
+###User 1 creates a new poll
+POST {{baseUrl}}/polls
+Content-Type: application/json
+
+{
+  "question": "What's your favorite animal?",
+  "publishedAt": "2025-08-30T10:00:00Z",
+  "validUntil": "2026-01-01T00:00:00Z",
+  "creatorId": "{{user1Id}}",
+  "options": [
+    { "caption": "dog", "presentationOrder": 1 },
+    { "caption": "cat", "presentationOrder": 2 }
+  ]
+}
+
+> {%
+    const body = JSON.parse(response.body || '{}');
+    client.assert(response.status === 201, 'Expected 201 Created for poll creation');
+    client.global.set('pollId', body.id);
+    if (body.options && body.options.length) {
+        client.global.set('option1Id', body.options[0].id);
+        client.global.set('option2Id', body.options[1].id);
+    }
+%}
+
+###List polls (-> shows the new poll)
+GET {{baseUrl}}/polls
+
+> {%
+    const polls = JSON.parse(response.body || '[]');
+    client.assert(Array.isArray(polls) && polls.length >= 1, 'Expected at least one poll');
+%}
+
+###User 2 votes on the poll
+POST {{baseUrl}}/polls/{{pollId}}/votes
+Content-Type: application/json
+
+{
+  "voterId": "{{user2Id}}",
+  "optionId": "{{option1Id}}"
+}
+
+> {%
+    const body = JSON.parse(response.body || '{}');
+    client.assert(response.status === 201, 'Expected 201 Created for vote');
+    client.global.set('voteId', body.id);
+%}
+
+###User 2 changes his vote
+PUT {{baseUrl}}/polls/{{pollId}}/votes
+Content-Type: application/json
+
+{
+  "voterId": "{{user2Id}}",
+  "optionId": "{{option2Id}}"
+}
+
+> {%
+    client.assert(response.status === 200 || response.status === 204, 'Expected 200/204 on vote update');
+%}
+
+###List votes (-> shows the most recent vote for User 2)
+GET {{baseUrl}}/votes
+
+> {%
+    const votes = JSON.parse(response.body || '[]');
+    client.assert(Array.isArray(votes) && votes.length >= 1, 'Expected at least one poll');
+%}
+
+###Delete the one poll
+DELETE {{baseUrl}}/polls/{{pollId}}
+
+> {%
+    client.assert(response.status === 200 || response.status === 204, 'Expected 200/204 on poll delete');
+%}
+
+###List votes (-> empty)
+GET {{baseUrl}}/votes
+
+> {%
+    const votes = JSON.parse(response.body || '[]');
+    client.assert(Array.isArray(votes) && votes.length == 0, 'Expected no votes');
+%}
