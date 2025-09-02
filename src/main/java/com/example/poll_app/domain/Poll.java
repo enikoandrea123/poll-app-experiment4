@@ -9,8 +9,8 @@ public class Poll {
     private Instant publishedAt;
     private Instant validUntil;
     private Long creatorId;
-    private boolean isPublic;
-    private boolean allowSingleVotePerUser;
+    private Boolean isPublic = true;
+    private Boolean allowSingleVotePerUser = true;
     private List<VoteOption> options;
 
     public Poll() {
