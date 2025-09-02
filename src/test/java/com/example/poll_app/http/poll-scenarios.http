@@ -9,7 +9,7 @@ Content-Type: application/json
   "email": "user1@email.com"
 }
 > {%
- const body = JSON.parse(response.body || '{}');
+ const body = response.body || {};
  client.assert(response.status===201, 'Expected 201 Created for user creation');
  client.global.set('user1Id', body.id)
  %}
@@ -18,7 +18,7 @@ Content-Type: application/json
 GET {{baseUrl}}/users
 
 > {%
- const users=JSON.parse(response.body || '[]');
+ const users=response.body || [];
  client.assert(Array.isArray(users) && users.length >= 1, 'Expected at least one user');
  %}
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 "email":"user2@email.com"
 }
 > {%
-    const body = JSON.parse(response.body || '{}');
+    const body = response.body || {};
     client.assert(response.status===201, 'Expected 201 Created for user creation');
     client.global.set('user2Id', body.id)
 %}
@@ -40,7 +40,7 @@ Content-Type: application/json
 GET {{baseUrl}}/users
 
 > {%
-    const users=JSON.parse(response.body || '[]');
+    const users=response.body || [];
     client.assert(Array.isArray(users) && users.length >= 2, 'Expected at least two user');
 %}
 
@@ -60,7 +60,7 @@ Content-Type: application/json
 }
 
 > {%
-    const body = JSON.parse(response.body || '{}');
+    const body = response.body || {};
     client.assert(response.status === 201, 'Expected 201 Created for poll creation');
     client.global.set('pollId', body.id);
     if (body.options && body.options.length) {
@@ -73,7 +73,7 @@ Content-Type: application/json
 GET {{baseUrl}}/polls
 
 > {%
-    const polls = JSON.parse(response.body || '[]');
+    const polls = response.body || [];
     client.assert(Array.isArray(polls) && polls.length >= 1, 'Expected at least one poll');
 %}
 
@@ -87,7 +87,7 @@ Content-Type: application/json
 }
 
 > {%
-    const body = JSON.parse(response.body || '{}');
+    const body = response.body || {};
     client.assert(response.status === 201, 'Expected 201 Created for vote');
     client.global.set('voteId', body.id);
 %}
@@ -109,7 +109,7 @@ Content-Type: application/json
 GET {{baseUrl}}/votes
 
 > {%
-    const votes = JSON.parse(response.body || '[]');
+    const votes = response.body || [];
     client.assert(Array.isArray(votes) && votes.length >= 1, 'Expected at least one poll');
 %}
 
@@ -124,6 +124,6 @@ DELETE {{baseUrl}}/polls/{{pollId}}
 GET {{baseUrl}}/votes
 
 > {%
-    const votes = JSON.parse(response.body || '[]');
+    const votes = response.body || [];
     client.assert(Array.isArray(votes) && votes.length == 0, 'Expected no votes');
 %}
