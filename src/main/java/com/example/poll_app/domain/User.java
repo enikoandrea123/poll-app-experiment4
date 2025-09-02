@@ -1,10 +1,19 @@
 package com.example.poll_app.domain;
 
 public class User {
+    private Long id;
     private String username;
     private String email;
 
     public User() {
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getEmail() {
@@ -22,4 +31,5 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
 }
