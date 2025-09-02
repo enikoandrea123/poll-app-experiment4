@@ -19,6 +19,8 @@ public class PollManager {
 
     private final AtomicLong userIdCounter = new AtomicLong(1);
     private final AtomicLong voteIdCounter = new AtomicLong(1);
+    private final AtomicLong voteOptionIdCounter = new AtomicLong(1);
+    private final AtomicLong pollIdCounter = new AtomicLong(1);
 
     public User createUser(User user) {
         long id = userIdCounter.getAndIncrement();
@@ -60,4 +62,35 @@ public class PollManager {
     public void deleteVotesByPoll(Long pollId) {
         votes.values().removeIf(v -> v.getPollId().equals(pollId));
     }
+
+
+    public Poll createPoll(Poll pollRequest) {
+        pollRequest.setId(pollIdCounter.getAndIncrement());
+
+        if (pollRequest.getOptions() != null) {
+            for (VoteOption option : pollRequest.getOptions()) {
+                option.setId(voteOptionIdCounter.getAndIncrement());
+            }
+        }
+        polls.put(pollRequest.getId(), pollRequest);
+        return pollRequest;
+    }
+
+    public List<Poll> getAllPolls() {
+        return new ArrayList<>(polls.values());
+    }
+
+    public Poll getPollById(Long pollId) {
+        return polls.get(pollId);
+    }
+
+    public void deletePollById(Long pollId) {
+        polls.remove(pollId);
+        votes.values().removeIf(v -> v.getPollId().equals(pollId));
+    }
+
+    public void deleteVotesByPollId(Long pollId) {
+        votes.values().removeIf(v -> v.getPollId().equals(pollId));
+    }
+
 }

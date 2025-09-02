@@ -3,10 +3,19 @@ package com.example.poll_app.domain;
 import java.time.Instant;
 
 public class VoteOption {
+    private Long id;
     private String caption;
     private int presentationOrder;
 
     public VoteOption() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public int getPresentationOrder() {
