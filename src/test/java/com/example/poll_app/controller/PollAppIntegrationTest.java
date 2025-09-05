@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -27,7 +28,7 @@ public class PollAppIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void createANewUser() throws Exception {
+    void pollAppIntegrationTests() throws Exception {
         ///Create a new user
         String user1Json = """
                 {
@@ -136,6 +137,33 @@ public class PollAppIntegrationTest {
         ///###Delete the one poll
         mockMvc.perform(delete("/polls/" + pollId))
                 .andExpect(status().isNoContent());
+    }
+    @Test
+    void createUser_shouldReturnCreatedUser() throws Exception {
+        ///Create a new user
+        String userJson = """
+                {
+                  "username": "user1",
+                  "email": "user1@email.com"
+                }
+                """;
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.username").value("user1"))
+                .andExpect(jsonPath("$.email").value("user1@email.com"));
+    }
+
+    @Test
+    void listAllUsers_shouldReturnEmptyListInitially() throws Exception {
+        ///###List all users (-> shows the newly created user)
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
