@@ -1,7 +1,5 @@
 package com.example.poll_app.domain;
 
-import java.time.Instant;
-
 public class VoteOption {
     private Long id;
     private String caption;
