@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.Collection;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping
 public class VoteController {
