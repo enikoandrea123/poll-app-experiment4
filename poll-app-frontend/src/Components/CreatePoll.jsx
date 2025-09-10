@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import "./CreatePoll.css";
 
 export default function CreatePoll() {
@@ -10,6 +10,13 @@ export default function CreatePoll() {
         const updated = [...options];
         updated[idx] = value;
         setOptions(updated);
+    };
+
+    const handleDeleteOption = (idx) => {
+        if (options.length > 2) {
+            const updated = options.filter((_, i) => i !== idx);
+            setOptions(updated);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -28,7 +35,7 @@ export default function CreatePoll() {
 
         const res = await fetch("http://localhost:8080/polls", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify(poll),
         });
 
@@ -55,19 +62,25 @@ export default function CreatePoll() {
 
             <div className="poll-options">
                 {options.map((opt, idx) => (
-                    <input
-                        key={idx}
-                        type="text"
-                        value={opt}
-                        onChange={(e) => handleChangeOption(idx, e.target.value)}
-                        placeholder={`Option ${idx + 1}`}
-                        className="poll-input"
-                    />
+                    <div key={idx} className="poll-option-row">
+                        <input
+                            type="text"
+                            value={opt}
+                            onChange={(e) => handleChangeOption(idx, e.target.value)}
+                            placeholder={`Option ${idx + 1}`}
+                            className="poll-input"
+                        />
+                        {options.length > 2 && idx >= 2 && (
+                            <button
+                                type="button"
+                                onClick={() => handleDeleteOption(idx)}
+                                className="delete-btn"
+                                title="delete this option"
+                            > ❌
+                            </button>
+                        )}
+                    </div>
                 ))}
-            </div>
-
-            <div className="publicity">
-
             </div>
 
             <div className="poll-buttons">
