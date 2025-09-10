@@ -1,5 +1,6 @@
 import {useState} from "react";
 import "./CreatePoll.css";
+import { HiArchiveBoxXMark } from "react-icons/hi2";
 
 export default function CreatePoll() {
     const [question, setQuestion] = useState("");
@@ -76,7 +77,8 @@ export default function CreatePoll() {
                                 onClick={() => handleDeleteOption(idx)}
                                 className="delete-btn"
                                 title="delete this option"
-                            > ❌
+                            >
+                                <HiArchiveBoxXMark/>
                             </button>
                         )}
                     </div>
