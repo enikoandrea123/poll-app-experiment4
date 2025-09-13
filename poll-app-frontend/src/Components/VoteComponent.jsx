@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./VoteComponent.css";
 
 export default function VoteComponent({ user, mode, onLogout, onGoToCreatePoll, onGoHome }) {
     const [polls, setPolls] = useState([]);
@@ -6,7 +7,7 @@ export default function VoteComponent({ user, mode, onLogout, onGoToCreatePoll, 
 
     useEffect(() => {
         const fetchPolls = () => {
-            fetch("http://localhost:8080/polls")
+            fetch("/polls")
                 .then((res) => res.json())
                 .then((data) => {
                     const filtered = mode === "public"
@@ -34,7 +35,7 @@ export default function VoteComponent({ user, mode, onLogout, onGoToCreatePoll, 
             optionId,
         };
 
-        const res = await fetch(`http://localhost:8080/polls/${pollId}/votes`, {
+        const res = await fetch(`/polls/${pollId}/votes`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(vote),
@@ -45,7 +46,7 @@ export default function VoteComponent({ user, mode, onLogout, onGoToCreatePoll, 
                 setUserVotes((prev) => [...prev, pollId]);
             }
 
-            const updatedPolls = await fetch("http://localhost:8080/polls").then((r) =>
+            const updatedPolls = await fetch("/polls").then((r) =>
                 r.json()
             );
             const filtered = mode === "public"
@@ -60,34 +61,39 @@ export default function VoteComponent({ user, mode, onLogout, onGoToCreatePoll, 
     return (
         <div className="vote-container">
             <div className="vote-header">
-                {mode === "public" ? (
-                    <>
-                        <p className="welcome-msg">Public Polls</p>
-                        <button className="btn btn-secondary" onClick={onGoHome}>
-                            ⬅ Back to home
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        {user && <p className="welcome-msg">Hello, {user.username}👋🏻 </p>}
-                        <button className="btn btn-secondary" onClick={onGoToCreatePoll}>
+                {mode === "public" && (
+                    <button className="btn btn-secondary back-btn" onClick={onGoHome}>
+                        Back to home
+                    </button>
+                )}
+
+                {mode === "private" && (
+                    <div className="private-actions">
+                        <button className="btn btn-secondary back-btn" onClick={onGoToCreatePoll}>
                             Create Poll
                         </button>
-                        <button className="btn btn-danger" onClick={onLogout}>
+                        <button className="btn btn-danger logout-btn" onClick={onLogout}>
                             🚪 Logout
                         </button>
-                    </>
+                    </div>
                 )}
             </div>
 
             {polls.length === 0 ? (
-                <p>No polls available.</p>
+                <p className="no-polls-msg">No polls available.</p>
             ) : (
                 polls.map((poll) => (
                     <div key={poll.id} className="poll-card">
-                        <h3>
-                            Poll #{poll.id} {poll.public ? "(Public)" : "(Private)"}
-                        </h3>
+                        <div className="poll-header">
+                            <h3 className="poll-title">
+                                🗳️ Poll #{poll.id}
+                            </h3>
+                            <p className="poll-meta">
+                                👤 {poll.creatorName || "Unknown"} • 🕒{" "}
+                                {poll.createdAt ? new Date(poll.createdAt).toLocaleString() : "N/A"}
+                            </p>
+                        </div>
+
                         <p className="poll-question">{poll.question}</p>
 
                         <ul className="options-list">

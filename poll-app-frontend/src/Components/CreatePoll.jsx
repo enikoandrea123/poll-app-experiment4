@@ -38,7 +38,7 @@ export default function CreatePoll({ onLogout, onGoToPrivateVote }) {
         };
 
         try {
-            const res = await fetch("http://localhost:8080/polls", {
+            const res = await fetch("/polls", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(poll),
