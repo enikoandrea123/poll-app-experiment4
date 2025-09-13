@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function VoteComponent({user, mode, onLogout, onGoToCreatePoll}) {
+export default function VoteComponent({ user, mode, onLogout, onGoToCreatePoll, onGoHome }) {
     const [polls, setPolls] = useState([]);
     const [userVotes, setUserVotes] = useState([]);
 
@@ -60,20 +60,23 @@ export default function VoteComponent({user, mode, onLogout, onGoToCreatePoll}) 
     return (
         <div className="vote-container">
             <div className="vote-header">
-                {user ? (
+                {mode === "public" ? (
                     <>
-                        <p className="welcome-msg">Hello, {user.username}</p>
+                        <p className="welcome-msg">Public Polls</p>
+                        <button className="btn btn-secondary" onClick={onGoHome}>
+                            ⬅ Back to home
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        {user && <p className="welcome-msg">Hello, {user.username}👋🏻 </p>}
                         <button className="btn btn-secondary" onClick={onGoToCreatePoll}>
-                            ➕ Create Poll
+                            Create Poll
                         </button>
                         <button className="btn btn-danger" onClick={onLogout}>
                             🚪 Logout
                         </button>
                     </>
-                ) : (
-                    <p className="welcome-msg">
-                        {mode === "public" ? "Public Polls" : "Private Polls"}
-                    </p>
                 )}
             </div>
 

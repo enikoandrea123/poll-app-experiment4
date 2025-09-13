@@ -51,6 +51,7 @@ export default function App() {
                 <VoteComponent
                     mode="public"
                     user={user}
+                    onGoHome={() => setView("home")}
                     onLogout={handleLogout}
                     onGoToCreatePoll={() => setView("createPoll")}
                 />
@@ -60,6 +61,7 @@ export default function App() {
                 <VoteComponent
                     mode="private"
                     user={user}
+                    onGoHome={() => setView("home")}
                     onLogout={handleLogout}
                     onGoToCreatePoll={() => setView("createPoll")}
                 />
