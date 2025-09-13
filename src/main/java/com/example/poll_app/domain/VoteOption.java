@@ -4,6 +4,7 @@ public class VoteOption {
     private Long id;
     private String caption;
     private int presentationOrder;
+    private int voteOptionCount;
 
     public VoteOption() {
     }
@@ -30,5 +31,13 @@ public class VoteOption {
 
     public void setCaption(String caption) {
         this.caption = caption;
+    }
+
+    public void setVoteOptionCount(int voteOptionCount) {
+        this.voteOptionCount = voteOptionCount;
+    }
+
+    public int getVoteOptionCount() {
+        return voteOptionCount;
     }
 }
