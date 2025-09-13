@@ -1,5 +1,7 @@
 package com.example.poll_app.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -9,9 +11,10 @@ public class Poll {
     private Instant publishedAt;
     private Instant validUntil;
     private Long creatorId;
-    private Boolean isPublic = true;
     private Boolean allowSingleVotePerUser = true;
     private List<VoteOption> options;
+    @JsonProperty("isPublic")
+    private Boolean isPublic = true;
 
     public Poll() {
     }
@@ -63,6 +66,7 @@ public class Poll {
     public boolean isPublic() {
         return isPublic;
     }
+
     public void setPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
@@ -70,6 +74,7 @@ public class Poll {
     public boolean isAllowSingleVotePerUser() {
         return allowSingleVotePerUser;
     }
+
     public void setAllowSingleVotePerUser(boolean allowSingleVotePerUser) {
         this.allowSingleVotePerUser = allowSingleVotePerUser;
     }
