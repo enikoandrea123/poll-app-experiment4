@@ -33,14 +33,14 @@ public class PollManager {
         return users.values();
     }
 
-    public Vote createVote(Long pollId, Long voteId, Long optionId) {
+    public Vote createVote(Long pollId, Long voterId, Long optionId) {
         Vote vote = new Vote();
         vote.setId(voteIdCounter.getAndIncrement());
         vote.setPollId(pollId);
         vote.setOptionId(optionId);
-        vote.setVoterId(voteId);
+        vote.setVoterId(voterId);
         vote.setPublishedAt(Instant.now());
-        votes.put(vote.getVoterId(), vote);
+        votes.put(vote.getId(), vote);
         return vote;
     }
 
@@ -77,7 +77,21 @@ public class PollManager {
     }
 
     public List<Poll> getAllPolls() {
-        return new ArrayList<>(polls.values());
+        List<Poll> all = new ArrayList<>(polls.values());
+
+        for (Poll poll : all) {
+            if (poll.getOptions() != null) {
+                for (VoteOption option : poll.getOptions()) {
+                    long count = votes.values().stream()
+                            .filter(v -> v.getPollId().equals(poll.getId()) &&
+                                    v.getOptionId().equals(option.getId()))
+                            .count();
+                    option.setVoteOptionCount((int) count);
+                }
+            }
+        }
+
+        return all;
     }
 
     public Poll getPollById(Long pollId) {
