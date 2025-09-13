@@ -18,12 +18,12 @@ export default function App() {
     };
 
     const handleGoToPublicVote = () => {
-        setView("vote");
+        setView("vote-public");
     };
     
     const handleGoToPrivateVote = () => {
         if (user) {
-            setView("vote");
+            setView("vote-private");
         } else {
             alert("Please log in to access private polls!");
             setView("home");
@@ -47,8 +47,18 @@ export default function App() {
                 />
             )}
 
-            {view === "vote" && (
+            {view === "vote-public" && (
                 <VoteComponent
+                    mode="public"
+                    user={user}
+                    onLogout={handleLogout}
+                    onGoToCreatePoll={() => setView("createPoll")}
+                />
+            )}
+
+            {view === "vote-private" && user && (
+                <VoteComponent
+                    mode="private"
                     user={user}
                     onLogout={handleLogout}
                     onGoToCreatePoll={() => setView("createPoll")}

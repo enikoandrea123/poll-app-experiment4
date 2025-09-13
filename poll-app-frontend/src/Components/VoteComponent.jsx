@@ -1,101 +1,107 @@
 import { useEffect, useState } from "react";
 
-export default function VoteComponent() {
+export default function VoteComponent({user, mode, onLogout, onGoToCreatePoll}) {
     const [polls, setPolls] = useState([]);
+    const [userVotes, setUserVotes] = useState([]);
 
     useEffect(() => {
+        const fetchPolls = () => {
+            fetch("http://localhost:8080/polls")
+                .then((res) => res.json())
+                .then((data) => {
+                    const filtered = mode === "public"
+                        ? data.filter((p) => p.public)
+                        : data.filter((p) => !p.public);
+                    setPolls(filtered);
+                })
+                .catch((err) => console.error("Failed to fetch polls", err));
+        };
+
         fetchPolls();
-    }, []);
+        const interval = setInterval(fetchPolls, 3000);
+        return () => clearInterval(interval);
+    }, [mode]);
 
-    const fetchPolls = async () => {
-        try {
-            const res = await fetch("http://localhost:8080/polls");
-            const data = await res.json();
-            setPolls(data);
-        } catch (err) {
-            console.error("Error fetching polls:", err);
+    const handleVote = async (pollId, optionId) => {
+        const poll = polls.find((p) => p.id === pollId);
+        if (!poll.public && poll.allowSingleVotePerUser && userVotes.includes(pollId)) {
+            alert("You already voted on this private poll.");
+            return;
         }
-    };
 
-    const handleVote = async (pollId, optionId, voterId, voterName) => {
-        setPolls((prevPolls) =>
-            prevPolls.map((poll) =>
-                poll.id === pollId
-                    ? {
-                        ...poll,
-                        options: poll.options.map((opt) =>
-                            opt.id === optionId
-                                ? { ...opt, votes: (opt.votes ?? 0) + 1 }
-                                : opt
-                        ),
-                    }
-                    : poll
-            )
-        );
+        const vote = {
+            voterId: user ? user.id : 0,
+            optionId,
+        };
 
-        try {
-            const res = await fetch(`http://localhost:8080/polls/${pollId}/votes`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ voterId, optionId }),
-            });
+        const res = await fetch(`http://localhost:8080/polls/${pollId}/votes`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(vote),
+        });
 
-            if (!res.ok) {
-                console.error("Vote failed on backend, rolling back...");
-                await fetchPolls();
+        if (res.ok) {
+            if (!poll.public) {
+                setUserVotes((prev) => [...prev, pollId]);
             }
-        } catch (err) {
-            console.error("Error voting:", err);
-            await fetchPolls();
-        }
-    };
 
-    const handleDelete = async (pollId) => {
-        try {
-            const res = await fetch(`http://localhost:8080/polls/${pollId}`, {
-                method: "DELETE",
-            });
-
-            if (res.ok) {
-                setPolls(polls.filter((p) => p.id !== pollId));
-            }
-        } catch (err) {
-            console.error("Error deleting poll:", err);
+            const updatedPolls = await fetch("http://localhost:8080/polls").then((r) =>
+                r.json()
+            );
+            const filtered = mode === "public"
+                ? updatedPolls.filter((p) => p.public)
+                : updatedPolls.filter((p) => !p.public);
+            setPolls(filtered);
+        } else {
+            alert("Failed to cast vote");
         }
     };
 
     return (
-        <div className="vote-component">
-            {polls.map((poll) => (
-                <div key={poll.id} className="poll-id">
-                    <div className="header">
-                        <h2 className="vote-title">Poll #{poll.id}</h2>
-                        <button
-                            onClick={() => handleDelete(poll.id)}
-                            className="delete-button"
-                        >
-                            Delete Poll
+        <div className="vote-container">
+            <div className="vote-header">
+                {user ? (
+                    <>
+                        <p className="welcome-msg">Hello, {user.username}</p>
+                        <button className="btn btn-secondary" onClick={onGoToCreatePoll}>
+                            ➕ Create Poll
                         </button>
+                        <button className="btn btn-danger" onClick={onLogout}>
+                            🚪 Logout
+                        </button>
+                    </>
+                ) : (
+                    <p className="welcome-msg">
+                        {mode === "public" ? "Public Polls" : "Private Polls"}
+                    </p>
+                )}
+            </div>
+
+            {polls.length === 0 ? (
+                <p>No polls available.</p>
+            ) : (
+                polls.map((poll) => (
+                    <div key={poll.id} className="poll-card">
+                        <h3>
+                            Poll #{poll.id} {poll.public ? "(Public)" : "(Private)"}
+                        </h3>
+                        <p className="poll-question">{poll.question}</p>
+
+                        <ul className="options-list">
+                            {poll.options.map((opt) => (
+                                <li key={opt.id} className="option-item">
+                                    <button
+                                        className="vote-btn"
+                                        onClick={() => handleVote(poll.id, opt.id)}
+                                    >
+                                        👍 {opt.caption}
+                                    </button>
+                                    <span className="vote-count">{opt.voteOptionCount || 0} votes</span></li>
+                            ))}
+                        </ul>
                     </div>
-
-                    <p className="poll-question">{poll.question}</p>
-
-                    <ul className="voting-form">
-                        {poll.options.map((opt) => (
-                            <li key={opt.id} className="vote-options">
-                                <button
-                                    className="vote-count"
-                                    onClick={() => handleVote(poll.id, opt.id, 1)}
-                                >
-                                   Vote 👍
-                                </button>
-                                <span className="vote-option-caption">{opt.caption} </span>
-                                <span className="vote-counting-votes">{opt.votes ?? 0} votes</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
+                ))
+            )}
         </div>
     );
 }
