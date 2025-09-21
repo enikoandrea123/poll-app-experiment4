@@ -1,15 +1,41 @@
 package com.example.poll_app.domain;
 
+import jakarta.persistence.*;
 import java.time.Instant;
 
+@Entity
+@Table(name = "votes")
 public class Vote {
-    private Long Id;
-    private Long voterId;
-    private Long optionId;
-    private Long pollId;
-    private Instant publishedAt;
 
-    public Vote() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Instant publishedAt = Instant.now();
+
+    @ManyToOne
+    @JoinColumn(name = "voter_id", nullable = false)
+    private User voter;
+
+    @ManyToOne
+    @JoinColumn(name = "poll_id", nullable = false)
+    private Poll poll;
+
+    @ManyToOne
+    @JoinColumn(name = "option_id", nullable = false)
+    private VoteOption votesOn;
+
+    public Vote() {}
+
+    public Vote(User voter, Poll poll, VoteOption votesOn) {
+        this.voter = voter;
+        this.poll = poll;
+        this.votesOn=votesOn;
+    }
+
+
+    public Long getId() {
+        return id;
     }
 
     public Instant getPublishedAt() {
@@ -20,35 +46,27 @@ public class Vote {
         this.publishedAt = publishedAt;
     }
 
-    public Long getId() {
-        return Id;
+    public User getVoter() {
+        return voter;
     }
 
-    public Long getOptionId() {
-        return optionId;
+    public void setVoter(User voter) {
+        this.voter = voter;
     }
 
-    public Long getPollId() {
-        return pollId;
+    public Poll getPoll() {
+        return poll;
     }
 
-    public Long getVoterId() {
-        return voterId;
+    public void setPoll(Poll poll) {
+        this.poll = poll;
     }
 
-    public void setId(Long id) {
-        Id = id;
+    public VoteOption getOption() {
+        return votesOn;
     }
 
-    public void setOptionId(Long optionId) {
-        this.optionId = optionId;
-    }
-
-    public void setPollId(Long pollId) {
-        this.pollId = pollId;
-    }
-
-    public void setVoterId(Long voterId) {
-        this.voterId = voterId;
+    public void setOption(VoteOption option) {
+        this.votesOn = option;
     }
 }
