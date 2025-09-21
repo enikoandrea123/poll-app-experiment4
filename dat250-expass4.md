@@ -33,3 +33,8 @@ The JPQL queries were failing because my field was incorrectly named or mismatch
 PS.: I have used H2 before in a few projects, but usually I started with it from scratch and implemented entities first.  
 This time, adjusting an existing project to fit the tests was a new challenge, but somehow I managed it 😅.
 Ohh, and I forget to commit regularly, because of the confusion
+
+### Code
+👉 [My code for experiments 1-2-(3?)](https://github.com/enikoandrea123/poll-app)
+👉 [My code for experiments 4 (so this)](https://github.com/enikoandrea123/poll-app-experiment4)
+
