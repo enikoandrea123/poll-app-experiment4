@@ -36,5 +36,29 @@ Ohh, and I forget to commit regularly, because of the confusion
 
 ### Code
 👉 [My code for experiments 1-2-(3?)](https://github.com/enikoandrea123/poll-app)
-👉 [My code for experiments 4 (so this)](https://github.com/enikoandrea123/poll-app-experiment4)
+👉 [My code for experiments 4 (so this)](https://github.com/enikoandrea123/poll-app-experiment4
 
+
+I just added this 3 lines of code to the SetUp() to show the SQL log:
+.property("hibernate.show_sql", "true")
+.property("hibernate.format_sql", "true")
+.property("hibernate.use_sql_comments", "true")
+
+![log imagine](log.png)
+
+
+## Inspecting the database
+
+I am using H2 in-memory and to see what's going on there I had to install the h2-tools dependency:
+
+```
+dependencies {
+    implementation("com.h2database:h2:2.3.232")
+    runtimeOnly("com.h2database:h2-tools:2.3.232") // contains Shell/Console
+}
+```
+Then, after I ran my tests and manually checked the database in cmd since it is stores in local (polls.mv.db)
+However, when I checked for tables they where empty.
+![cmd imagine](cmd.png))
+But in the logs it shows that it actually inserting and adding data to the database.
+![log insert data](log_insert.png))
